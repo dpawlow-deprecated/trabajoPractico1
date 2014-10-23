@@ -8,8 +8,7 @@ long (x:xs) = 1 + long xs
 -- Ejercicio 2 :
 
 e :: Integer -> Integer -> [Integer]
-e n k = {- | n /= 2*k  = -} head (e' (eAux k 1) (eAux (n - k) 0))
---      | otherwise = 
+e n k = concat (e' (eAux k 1) (eAux (n - k) 0))
 
 eAux :: Integer -> Integer -> [[Integer]]
 eAux 0 _ = []
@@ -52,12 +51,17 @@ equivalentes' (x:xs) (y:ys) n = (x:xs) == (y:ys) || equivalentes' (x:xs) (ys ++ 
 -- Ejercicio 4
 
 eEquivalente :: Integer -> Integer -> [[Integer]]
-eEquivalente n k = eEquivalente' (e n k) (long (e n k))
+eEquivalente n k = eliminarRepetidos (eEquivalente' (e n k) (long (e n k)))
 
 eEquivalente' :: [Integer] -> Integer -> [[Integer]]
 eEquivalente' _ 0 = []
 eEquivalente' (x:xs) n | x == 1 = [(x:xs)] ++ (eEquivalente' (xs++[x]) (n-1))
 					   | otherwise = eEquivalente' (xs++[x]) (n-1)
+
+eliminarRepetidos :: Eq a => [a] -> [a]
+eliminarRepetidos [] = []
+eliminarRepetidos (x:xs) | elem x xs = eliminarRepetidos xs				   
+                         | otherwise = x : eliminarRepetidos xs
 
 -- Ejercicio 5
 
@@ -67,5 +71,3 @@ nkEquivalente xs = equivalentes xs (e (long xs) (nkEquivalente' xs))
 nkEquivalente' :: [Integer] -> Integer
 nkEquivalente' [] = 0
 nkEquivalente' (x:xs) = x + nkEquivalente' xs
-
-
