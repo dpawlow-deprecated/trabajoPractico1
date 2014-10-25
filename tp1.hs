@@ -45,6 +45,7 @@ equivalentes :: [Integer] -> [Integer] -> Bool
 equivalentes xs ls = equivalentes' xs ls (long ls)
 
 equivalentes' :: [Integer] -> [Integer] -> Integer -> Bool
+equivalentes' [] [] _ = True
 equivalentes' _ _ 0 = False
 equivalentes' (x:xs) (y:ys) n = (x:xs) == (y:ys) || equivalentes' (x:xs) (ys ++ [y]) ((long (y:ys))-1)
 
@@ -66,8 +67,8 @@ eliminarRepetidos (x:xs) | elem x xs = eliminarRepetidos xs
 -- Ejercicio 5
 
 nkEquivalente :: [Integer] -> Bool
-nkEquivalente xs = equivalentes xs (e (long xs) (nkEquivalente' xs))
+nkEquivalente xs = equivalentes xs (e (long xs) (cantUnos xs))
 
-nkEquivalente' :: [Integer] -> Integer
-nkEquivalente' [] = 0
-nkEquivalente' (x:xs) = x + nkEquivalente' xs
+cantUnos :: [Integer] -> Integer
+cantUnos [] = 0
+cantUnos (x:xs) = x + cantUnos xs
