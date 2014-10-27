@@ -16,8 +16,10 @@ eAux n m = [m] : (eAux (n - 1) m)
  
 e' :: [[a]] -> [[a]] -> [[a]]
 e' xs [] = xs
-e' xs ys | long xs >= long ys = e' (agrupar (mezclar (take' (long ys) xs) ys)) (drop' (long ys) xs)
-         | otherwise = e' (agrupar (mezclar xs (take' (long xs) ys))) (drop' (long xs) ys)
+e' xs ys | long xs >= long ys = e' (agrupar (mezclar (take' lys xs) ys)) (drop' lys xs)
+         |          otherwise = e' (agrupar (mezclar xs (take' lxs ys))) (drop' lxs ys)
+         where long ys = lys
+         where long xs = lxs
 
 take' :: Integer -> [a] -> [a]
 take' 0 _ = []
@@ -47,8 +49,7 @@ equivalentes xs ys = long xs == long ys && equivalentes' xs ys (long ys)
 equivalentes' :: [Integer] -> [Integer] -> Integer -> Bool
 equivalentes' [] [] _ = True
 equivalentes' _ _ 0 = False
-equivalentes' (x:xs) (y:ys) n | long (x:xs) /= long (y:ys) = False
-                              | otherwise = (x:xs) == (y:ys) || equivalentes' (x:xs) (ys ++ [y]) ((long (y:ys))-1)
+equivalentes' (x:xs) (y:ys) n = (x:xs) == (y:ys) || equivalentes' (x:xs) (ys ++ [y]) (n-1)
 
 -- Ejercicio 4
 
@@ -58,9 +59,9 @@ eEquivalente n k = eliminarRepetidos (eEquivalente' (e n k) (long (e n k)))
 eEquivalente' :: [Integer] -> Integer -> [[Integer]]
 eEquivalente' _ 0 = []
 eEquivalente' (x:xs) n | x == 1 = [(x:xs)] ++ (eEquivalente' (xs++[x]) (n-1))
-					   | otherwise = eEquivalente' (xs++[x]) (n-1)
+                       | otherwise = eEquivalente' (xs++[x]) (n-1)
 
-eliminarRepetidos :: Eq a => [a] -> [a]
+eliminarRepetidos :: [[Integer]] -> [[Integer]]
 eliminarRepetidos [] = []
 eliminarRepetidos (x:xs) | elem x xs = eliminarRepetidos xs				   
                          | otherwise = x : eliminarRepetidos xs
