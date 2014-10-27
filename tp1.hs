@@ -42,12 +42,13 @@ agrupar (x:y:xs) = [x++y]++(agrupar xs)
 -- Ejercicio 3
 
 equivalentes :: [Integer] -> [Integer] -> Bool
-equivalentes xs ls = equivalentes' xs ls (long ls)
+equivalentes xs ys = long xs == long ys && equivalentes' xs ys (long ys)
 
 equivalentes' :: [Integer] -> [Integer] -> Integer -> Bool
 equivalentes' [] [] _ = True
 equivalentes' _ _ 0 = False
-equivalentes' (x:xs) (y:ys) n = (x:xs) == (y:ys) || equivalentes' (x:xs) (ys ++ [y]) ((long (y:ys))-1)
+equivalentes' (x:xs) (y:ys) n | long (x:xs) /= long (y:ys) = False
+                              | otherwise = (x:xs) == (y:ys) || equivalentes' (x:xs) (ys ++ [y]) ((long (y:ys))-1)
 
 -- Ejercicio 4
 
