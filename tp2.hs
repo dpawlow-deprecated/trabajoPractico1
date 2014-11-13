@@ -38,6 +38,17 @@ eliminarImplicaciones x = x
 
 -- Ejercicio 4:
 
+--aFNN :: Proposicion -> Proposicion
+--aFNN x = aFNN' (eliminarImplicaciones x)
+
+deMorgan :: Proposicion -> Proposicion
+deMorgan (No (Y a b)) = O (No (deMorgan a)) (No (deMorgan b))
+deMorgan (No (O a b)) = Y (No (deMorgan a)) (No (deMorgan b))
+deMorgan (O a b)     = O (deMorgan a) (deMorgan b)
+deMorgan (Y a b)     = Y (deMorgan a) (deMorgan b)
+deMorgan (Imp a b)   = Imp (deMorgan a) (deMorgan b)
+deMorgan x = x
+
 
 
 -- Ejercicio 5:
