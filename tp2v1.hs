@@ -22,10 +22,8 @@ Ejercicio 1
 ******************************************************************************-}
 atomoONegacion :: Proposicion -> Bool
 atomoONegacion (No x) = True
-atomoONegacion x = x == P || x == Q || x == R -- || x == (No x)-- || x == (No Q) || x == (No R)
+atomoONegacion x = x == P || x == Q || x == R -- || x == (No P)-- || x == (No Q) || x == (No R)
 
-negacion :: Proposicion -> Proposicion 
-negacion x = (No x)
 {-
 *Tp2> atomoONegacion P
 True
@@ -131,28 +129,29 @@ devuelve (R ∧ ¬P ) ∨ (¬Q ∧ ¬R)
 
 
 ******************************************************************************-}
-aFNN' :: Proposicion -> Proposicion
+aFNN :: Proposicion -> Proposicion
 
-aFNN' x = aFNN (eliminarImplicaciones x)
+aFNN x = aFN (eliminarImplicaciones x)
 --aFNN (Imp x y) =  (O (No (aFNN x)) (aFNN y))
-aFNN (Y x (O y z)) = (O (Y (aFNN x) (aFNN y)) (Y (aFNN x) (aFNN z)))
-aFNN (No (Y x y)) = (O (No (aFNN x)) (No (aFNN y)))
-aFNN (No (O x y)) = (Y (No (aFNN x)) (No (aFNN y)))
-aFNN (No (No x) ) =   (aFNN x)
-aFNN ( No x  ) =  (No (aFNN x))
-aFNN ( Y  x y) =  (Y (aFNN x) (aFNN y))
-aFNN ( O  x y) =  (O (aFNN x) (aFNN y))
---aFNN (No P) = (No P)
---aFNN (No Q) = (No Q)
---aFNN (No R) = (No R)
-aFNN (P) = P
-aFNN (Q) = Q
-aFNN (R) = R
+aFN (P) = P
+aFN (Q) = Q
+aFN (R) = R
+--aFN (No P) = (No P)
+--aFN (No Q) = (No Q)
+--aFN (No R) = (No R)
+aFN (No (O x y)) = (Y (No (aFN x)) (No (aFN y)))
+aFN (No (Y x y)) = (O (No (aFN x)) (No (aFN y)))
+aFN (No (No x) ) =   (aFN x)
+aFN ( No x  ) =  (No (aFN x))
+aFN (Y x (O y z)) = (O (Y (aFN x) (aFN y)) (Y (aFN x) (aFN z)))
+aFN ( Y  x y) =  (Y (aFN x) (aFN y))
+aFN ( O  x y) =  (O (aFN x) (aFN y))
+
 
 {-
-*Tp2> aFNN' (No (Y (O (No R) P) (No (No (O Q R)))))
+*Tp2> aFNN (No (Y (O (No R) P) (No (No (O Q R)))))
 ~(~R v P) v ~(Q v R)
-*Tp2> aFNN' (No (Y (Imp R P) (No (No (O Q R)))))
+*Tp2> aFNN (No (Y (Imp R P) (No (No (O Q R)))))
 ~(~R v P) v ~(Q v R)
 
 -}
@@ -290,7 +289,7 @@ tipo2 x n valor
 
 
 -- Algunos ejemplos que pueden usar para probar las funciones
-ejemplo1 = (O P P)  `Imp` (No (Y Q R)) -- (P ∨ P ) ⇒ ¬(Q ∧ R)
+ejemplo1 = (O P P)  `Imp` (No (Y Q R)) -- (P ∨ P ) => ¬(Q ∧ R)
 ejemplo2 = No (Y (Imp R P) (No (O Q R)))
 ejemplo3 = No (No (Y (Imp R P) (No (O Q R))))
 ejemplo4 = No (Y (Imp R P) (No (No (O Q R))))
