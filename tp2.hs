@@ -5,27 +5,29 @@ data Proposicion = P
                  | Y Proposicion Proposicion
                  | O Proposicion Proposicion
                  | Imp Proposicion Proposicion deriving Eq
+
 instance Show Proposicion where
-  show P = "P"
-  show Q = "Q"
-  show R = "R"
-  show (Y a b)   = (show' a) ++ " ^ " ++ (show' b)  
-  show (O a b)   = (show' a) ++ " v " ++ (show' b)  
-  show (Imp a b) = (show' a) ++ " => " ++ (show' b)
-  show (No a)    = "~" ++ (show' a)
+        -- Ejercicio 2:
+        show P = "P"
+        show Q = "Q"
+        show R = "R"
+        show (Y a b)   = (show' a) ++ " ^ " ++ (show' b)  
+        show (O a b)   = (show' a) ++ " v " ++ (show' b)  
+        show (Imp a b) = (show' a) ++ " => " ++ (show' b)
+        show (No a)    = "~" ++ (show' a)
 
 show' :: Proposicion -> String
 show' a | atomoONegacion a = show a
-        | otherwise = "(" ++ (show a) ++ ")"
+        | otherwise        = "(" ++ (show a) ++ ")"
 
 
--- Ej 1:
+-- Ejercicio 1:
 
 atomoONegacion :: Proposicion -> Bool
-atomoONegacion (No x) = True
-atomoONegacion x = x == P || x == Q || x == R
+atomoONegacion (No a) = True
+atomoONegacion a      = a == P || a == Q || a == R
 
--- Ej 3
+-- Ejercicio 3:
 
 eliminarImplicaciones :: Proposicion -> Proposicion
 eliminarImplicaciones (Imp a b) = O (No (eliminarImplicaciones a)) (eliminarImplicaciones b)
@@ -34,5 +36,62 @@ eliminarImplicaciones (O a b)   = O (eliminarImplicaciones a) (eliminarImplicaci
 eliminarImplicaciones (Y a b)   = Y (eliminarImplicaciones a) (eliminarImplicaciones b)
 eliminarImplicaciones x = x
 
--- where e = eliminarImplicaciones
---eliminarImplicaciones (a (b)) =
+-- Ejercicio 4:
+
+
+
+-- Ejercicio 5:
+
+evaluar :: Proposicion -> (Bool, Bool, Bool) -> Bool
+evaluar P (p,q,r) = p
+evaluar Q (p,q,r) = q
+evaluar R (p,q,r) = r
+evaluar (No a)  (p,q,r) = not(evaluar a (p,q,r))
+evaluar (Y a b) (p,q,r) = (evaluar a (p,q,r)) && (evaluar b (p,q,r))
+evaluar (O a b) (p,q,r) = (evaluar a (p,q,r)) || (evaluar b (p,q,r))
+evaluar prop    (p,q,r) = evaluar (eliminarImplicaciones prop) (p,q,r)
+
+-- Ejercicio 6:
+
+combinacion :: Integer -> (Bool, Bool, Bool)
+combinacion n = (1 == (div (div n 2) 2), 1 == (mod (div n 2) 2), 1 == (mod n 2))
+
+-- Ejercicio 7:
+
+data TipoFormula = Tautologia | Contradiccion | Contingencia deriving Show
+
+tipoDeFormula:: Proposicion -> TipoFormula
+tipoDeFormula prop | (tipo prop 7 True ) == True = Tautologia
+                   | (tipo prop 7 False) == True = Contradiccion
+                   | otherwise                   = Contingencia
+
+tipo :: Proposicion -> Integer -> Bool -> Bool
+tipo prop n bool | n == 0    = (bool == evaluar prop (combinacion 0))
+                 | otherwise = (bool == evaluar prop (combinacion n)) && tipo prop (n-1) bool
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
