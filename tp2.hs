@@ -38,18 +38,32 @@ eliminarImplicaciones x = x
 
 -- Ejercicio 4:
 
---aFNN :: Proposicion -> Proposicion
---aFNN x = aFNN' (eliminarImplicaciones x)
+{-
+aFNN :: Proposicion -> Proposicion
+aFNN x = deMorgan (eliminarImplicaciones x)
 
 deMorgan :: Proposicion -> Proposicion
 deMorgan (No (Y a b)) = O (No (deMorgan a)) (No (deMorgan b))
 deMorgan (No (O a b)) = Y (No (deMorgan a)) (No (deMorgan b))
-deMorgan (O a b)     = O (deMorgan a) (deMorgan b)
-deMorgan (Y a b)     = Y (deMorgan a) (deMorgan b)
-deMorgan (Imp a b)   = Imp (deMorgan a) (deMorgan b)
+deMorgan (No a)       = No (deMorgan a)
+deMorgan (O a b)      = O (deMorgan a) (deMorgan b)
+deMorgan (Y a b)      = Y (deMorgan a) (deMorgan b)
+deMorgan (Imp a b)    = Imp (deMorgan a) (deMorgan b)
 deMorgan x = x
 
+aFNN :: Proposicion -> Proposicion
 
+aFNN x = aFN (eliminarImplicaciones x)
+--aFN (Imp x y)     = (O (aFN (No x)) (aFN y))
+aFN (No (Y x y))  = (O (aFN (No x)) (aFN (No y)))
+aFN (No (O x y))  = (Y (aFN (No x)) (aFN (No y)))
+aFN (No (No x) )  = (aFN x)
+aFN (No x)        = (No (aFN x))
+aFN (Y x (O y z)) = (O (aFN (Y x y)) (aFN (Y x z)))
+aFN (Y x y) = (Y (aFN x) (aFN y))
+aFN (O x y) = (O (aFN x) (aFN y))
+aFN x = x
+-}
 
 -- Ejercicio 5:
 
