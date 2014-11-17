@@ -67,11 +67,11 @@ aFN :: Proposicion -> Proposicion
 aFN (No (Y a b))  = (O (aFN (No a)) (aFN (No b)))
 aFN (No (O a b))  = (Y (aFN (No a)) (aFN (No b)))
 aFN (No (No a) )  = (aFN a)
--aFN (No a)        = (No (aFN a))--repetida3
-aFN (Y a (O b c)) = (O (aFN (Y a b)) (aFN (Y a c)))
--aFN (Y a b) = (Y (aFN a) (aFN b))--repetida1
--aFN (O a b) = (O (aFN a) (aFN b))--repetida2
-aFN2 a = a--repetida4 y modificada
+aFN (No a)        = (No (aFN a))--repetida3
+aFN (Y a (O b c)) = (O (aFN (Y a b)) (aFN (Y a c)))--opcional
+aFN (Y a b) = (Y (aFN a) (aFN b))--repetida1
+aFN (O a b) = (O (aFN a) (aFN b))--repetida2
+aFN a = a --repetida4 
 
 {-INTERESANTE Y MUY ESCLARECEDOR
 *Main> aFFN (No (Y (Imp R P) (No (No (O Q R)))))
