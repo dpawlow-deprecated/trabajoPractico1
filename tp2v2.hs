@@ -21,6 +21,10 @@ show' :: Proposicion -> String
 show' a | atomoONegacion a = show a
         | otherwise        = "(" ++ (show a) ++ ")"
 
+{-
+*Main> No (No (Y (Imp R P) (No (O Q R))))
+~~((R => P) ^ ~(Q v R))
+-}
 
 -- Ejercicio 1:
 
@@ -28,14 +32,28 @@ atomoONegacion :: Proposicion -> Bool
 atomoONegacion (No a) = True
 atomoONegacion a      = a == P || a == Q || a == R
 
+{-
+*Main> atomoONegacion (No (Q `O` R))
+True
+*Main> atomoONegacion  (Q `O` R)
+False
+*Main> atomoONegacion  R
+True
+-}
+
 -- Ejercicio 3:
 
 eliminarImplicaciones :: Proposicion -> Proposicion
 eliminarImplicaciones (Imp a b) = O (No (eliminarImplicaciones a)) (eliminarImplicaciones b)
-eliminarImplicaciones (No a)    = No (eliminarImplicaciones a)--repetida3
-eliminarImplicaciones (O a b)   = O (eliminarImplicaciones a) (eliminarImplicaciones b)--repetida2
-eliminarImplicaciones (Y a b)   = Y (eliminarImplicaciones a) (eliminarImplicaciones b)--repetida1
-eliminarImplicaciones a = a--repetida4
+eliminarImplicaciones (No a)    = No (eliminarImplicaciones a)
+eliminarImplicaciones (O a b)   = O (eliminarImplicaciones a) (eliminarImplicaciones b)
+eliminarImplicaciones (Y a b)   = Y (eliminarImplicaciones a) (eliminarImplicaciones b)
+eliminarImplicaciones a = a
+
+{-
+*Main> eliminarImplicaciones (Imp P (Imp Q (Y R Q)))
+~P v (~Q v (R ^ Q))
+-}
 
 -- Ejercicio 4:
 
@@ -55,23 +73,31 @@ deMorgan x = x
 
 aFNN :: Proposicion -> Proposicion
 aFNN a = aFN (eliminarImplicaciones a)
-
+{-
 aFFN a = aFN (aFN2 a)
 aFN2 (Imp a b)  = (O (aFN2 (No a)) (aFN2 b))
-aFN2 (Y a b) = (Y (aFN2 a) (aFN2 b))--repetida1
-aFN2 (O a b) = (O (aFN2 a) (aFN2 b))--repetida2
-aFN2 (No a)  = (No (aFN2 a))--repetida3
-aFN2 a = a --repetida4
-
+aFN2 (Y a b) = (Y (aFN2 a) (aFN2 b))
+aFN2 (O a b) = (O (aFN2 a) (aFN2 b))
+aFN2 (No a)  = (No (aFN2 a))
+aFN2 a = a 
+-}
 aFN :: Proposicion -> Proposicion
 aFN (No (Y a b))  = (O (aFN (No a)) (aFN (No b)))
 aFN (No (O a b))  = (Y (aFN (No a)) (aFN (No b)))
 aFN (No (No a) )  = (aFN a)
-aFN (No a)        = (No (aFN a))--repetida3
+aFN (No a)        = (No (aFN a))
 aFN (Y a (O b c)) = (O (aFN (Y a b)) (aFN (Y a c)))--opcional
-aFN (Y a b) = (Y (aFN a) (aFN b))--repetida1
-aFN (O a b) = (O (aFN a) (aFN b))--repetida2
-aFN a = a --repetida4 
+aFN (Y a b) = (Y (aFN a) (aFN b))
+aFN (O a b) = (O (aFN a) (aFN b))
+aFN a = a 
+
+{-
+*Main> aFNN (No (Y (Imp R P) (No (No (O Q R)))))
+(R ^ ~P) v (~Q ^ ~R)
+-}
+
+
+
 
 {-INTERESANTE Y MUY ESCLARECEDOR
 *Main> aFFN (No (Y (Imp R P) (No (No (O Q R)))))
@@ -93,10 +119,35 @@ evaluar (Y a b) (p,q,r) = (evaluar a (p,q,r)) && (evaluar b (p,q,r))
 evaluar (O a b) (p,q,r) = (evaluar a (p,q,r)) || (evaluar b (p,q,r))
 evaluar prop    (p,q,r) = evaluar (eliminarImplicaciones prop) (p,q,r)
 
+{-
+*Main> evaluar (P `Imp` Q `Imp` R) (True, False, False)
+True
+*Main> evaluar (P `Imp` R) (True, True, False)
+False
+*Main> evaluar (No (Y (Imp R P) (No (No (O Q R))))) (True, False, True)
+False
+-}
+
 -- Ejercicio 6:
 
 combinacion :: Integer -> (Bool, Bool, Bool)
 combinacion n = (1 == (div (mod n 8) 4), 1 == (mod (div n 2) 2), 1 == (mod n 2))
+
+{-
+*Main> combinacion 0
+(False,False,False)
+*Main> combinacion 5
+(True,False,True)
+
+*Main> combinacion 1
+(False,False,True)
+*Main> combinacion (-38521)
+(True,True,True)
+*Main> combinacion (-38521 + 1)
+(False,False,False)
+*Main> combinacion (-38521 + 1 + 1)
+(False,False,True)
+-}
 
 -- Ejercicio 7:
 
@@ -109,8 +160,16 @@ tipoDeFormula prop | (tests prop 7 True ) == True = Tautologia
 
 tests :: Proposicion -> Integer -> Bool -> Bool
 tests prop n bool | n == 0    = (bool == evaluar prop (combinacion 0))
-                 | otherwise = (bool == evaluar prop (combinacion n)) && tests prop (n-1) bool
+                  | otherwise = (bool == evaluar prop (combinacion n)) && tests prop (n-1) bool
 
+{-
+*Main> tipoDeFormula (Imp P Q)
+Contingencia
+*Main> tipoDeFormula (Imp P P)
+Tautologia
+*Main> tipoDeFormula (Q `Y` No Q)
+Contradiccion
+-}
 
 -- Algunos ejemplos que pueden usar para probar las funciones
 ejemplo1 = (O P P)  `Imp` (No (Y Q R)) -- (P ∨ P ) ⇒ ¬(Q ∧ R)
@@ -131,29 +190,4 @@ ejemplo7 = ejemplo6 `Imp` ejemplo4
 ((((P v P) => ~(Q ^ R)) => ~((R => P) ^ ~~(Q v R))) ^ (~((R => P) ^ ~~(Q v R)) v ~~((R => P) ^ ~(Q v R)))) => ~((R => P) ^ ~~(Q v R))
 *Main> tipoDeFormula ejemplo7
 Tautologia
-:(
-
 -}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
